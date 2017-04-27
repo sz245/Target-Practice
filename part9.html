@@ -26,10 +26,19 @@ function preload() {
 var player;
 var platforms;
 var cursors;
+var ground;
+var repeatPlay;
+var endText;
 
 var stars;
-var score = 0;
+var score = 40;
 var scoreText;
+var level = 1;
+var levelText;
+var gravity;
+var gravityText;
+
+var ledge1, ledge2, ledge3;
 
 function create() {
 
@@ -46,32 +55,31 @@ function create() {
     platforms.enableBody = true;
 
     // Here we create the ground.
-    var ground = platforms.create(0, game.world.height - 64, 'platforms');
-
+    ground = platforms.create(0, game.world.height - 64, 'platforms');
+    ground.body.immovable = true;
+    
     //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
     clear.scale.setTo(0.5,0.6);
     ground.scale.setTo(2,2);
     
     //  This stops it from falling away when you jump on it
-    ground.body.immovable = true;
+    //ground.body.immovable = true;
 
     //  Now let's create two ledges
+    
+    ledge1 = platforms.create(-150, 570, 'platforms');
+    ledge1.body.immovable = true;
 
-    ledge = platforms.create(-150, 570, 'platforms');
-    ledge.body.immovable = true;
+    ledge2 = platforms.create(-10, 1, 'platforms');
+    ledge2.body.immovable = true;
+    ledge2.scale.setTo(5,2)
 
-    var ledge = platforms.create(-10, 1, 'platforms');
-    ledge.body.immovable = true;
-    ledge.scale.setTo(5,2)
+    ledge3 = platforms.create(-100, 300, 'platforms');
+    ledge3.body.immovable = true;
+    ledge3.scale.setTo(0.7,1)
+    
 
-    var ledge = platforms.create(-100, 300, 'platforms');
-    ledge.body.immovable = true;
-    ledge.scale.setTo(0.7,1)
-
-
-
-    // The player and its settings
-  player = game.add.sprite(68, game.world.height - 450, 'dude');
+    player = game.add.sprite(68, game.world.height - 450, 'dude');
 
 
     //  We need to enable physics on the player
@@ -83,8 +91,7 @@ function create() {
     player.body.collideWorldBounds = true;
 
     //  Our two animations, walking left and right.
-    player.animations.add('left', [0, 1, 2, 3], 10, true);
-    player.animations.add('right', [5, 6, 7, 8], 10, true);
+
 
     //  Finally some stars to collect
     stars = game.add.group();
@@ -95,17 +102,20 @@ function create() {
 
     //  Here we'll create 12 of them evenly spaced apart
  //  Create a star inside of the 'stars' group
-    var star = stars.create(150 * Math.random() + 400, 300, 'star');
+    var star = stars.create(30 * level + 350, 300, 'star');
 
     //  Let gravity do its thing
-    star.body.gravity.y = 125;
+    var gravity = star.body.gravity.y = 125;
 
     //  This just gives each star a slightly random bounce value
     star.body.bounce.y = 1.105//+ Math.random() * 0.2;
 
 
     //  The score
-    scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+    scoreText = game.add.text(20, 52, 'Score: 40', { fontSize: '32px', fill: '#000' });
+    levelText = game.add.text(20, 16, 'Level: 1', { fontSize: '32px', fill: '#000' })
+    gravityText = game.add.text(20, 86, 'Gravity: ' + gravity , { fontSize: '32px', fill: '#000' })
+    
 
     //  Our controls.
     cursors = game.input.keyboard.createCursorKeys();
@@ -115,11 +125,10 @@ function create() {
 function update() {
 
     //  Collide the player and the stars with the platforms
-    game.physics.arcade.collide(player, platforms);
+    game.physics.arcade.collide(player, ground, move);
+    game.physics.arcade.collide(player, platforms, () => console.log("collide"));
     game.physics.arcade.collide(stars, platforms);
-
-    //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    game.physics.arcade.overlap(player, stars, collectStar, null, this);
+    game.physics.arcade.overlap(player, stars, collectStar);
 
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
@@ -154,16 +163,47 @@ function update() {
 
 }
 
-function collectStar (player, star) {
+function move (player, ground) {
+    game.physics.arcade.moveToXY(player, 60, 100);
+    score -= 1;
+    scoreText.text = 'Score: ' + score;
+
+//
+
+}
+
+function collectStar (player , star) {
     
     // Removes the star from the screen
     star.kill();
 
-    //  Add and update the score
-    score += 10;
-    scoreText.text = 'Score: ' + score;
+    level += 1;
+    levelText.text = 'Level: ' + level;
+
+    if (level < 11) {
+    stars = game.add.group();
+  
+
+    //  We will enable physics for any star that is created in this group
+    stars.enableBody = true;
+
+    //  Here we'll create 12 of them evenly spaced apart
+ //  Create a star inside of the 'stars' group
+    var star = stars.create(25 * level + 350, 175, 'star');
+
+    //  Let gravity do its thing
+    var gravity = star.body.gravity.y = 125;
+
+    //  This just gives each star a slightly random bounce value
+    star.body.bounce.y = 1.105
+}
+
+    if (level > 10) {
+    endText = game.add.text(350, 300, "You Completed the Game!" , { fontSize: '50px', fill: '#000' })
+} 
 
 }
+
 
 </script>
 
