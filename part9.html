@@ -164,14 +164,20 @@ function update() {
 }
 
 function move (player, ground) {
+    if (score > 0) {
     game.physics.arcade.moveToXY(player, 60, 100);
     score -= 1;
     scoreText.text = 'Score: ' + score;
 
     player.body.x = 68;
     player.body.y = 150;
-
-}
+    }
+    
+    else {
+    endText = game.add.text(350, 300, "Game Over!" , { fontSize: '50px', fill: '#000' })
+    }
+        
+ }
 
 function collectStar (player , star) {
     
@@ -190,7 +196,7 @@ function collectStar (player , star) {
 
     //  Here we'll create 12 of them evenly spaced apart
  //  Create a star inside of the 'stars' group
-    var star = stars.create(25 * level + 350, 175, 'star');
+    var star = stars.create(21 * level + 350, 175, 'star');
 
     //  Let gravity do its thing
     var gravity = star.body.gravity.y = 125;
