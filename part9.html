@@ -174,7 +174,8 @@ function move (player, ground) {
     }
     
     else {
-    endText = game.add.text(350, 300, "Game Over!" , { fontSize: '50px', fill: '#000' })
+        player.kill();
+    endText = game.add.text(350, 330, "Game Over!" , { fontSize: '50px', fill: '#000' })
     }
         
  }
@@ -206,7 +207,7 @@ function collectStar (player , star) {
 }
 
     if (level > 10) {
-    endText = game.add.text(350, 300, "You Completed the Game!" , { fontSize: '50px', fill: '#000' })
+    endText = game.add.text(350, 270, "You Completed the Game!" , { fontSize: '50px', fill: '#000' })
 } 
 
 }
